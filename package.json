@@ -1,0 +1,25 @@
+import { build } from 'esbuild';
+
+const isDev = process.argv.includes('--dev');
+
+build({
+  entryPoints: ['src/main.ts'],
+  bundle: true,
+  platform: 'node',
+  external: ['obsidian'],
+  target: 'node16',
+  sourcemap: isDev,
+  minify: !isDev,
+  outfile: 'main.js',
+  loader: {
+    '.png': 'dataurl',
+    '.jpg': 'dataurl',
+    '.svg': 'dataurl'
+  }
+}).then(() => {
+  console.log('Build succeeded');
+  if (isDev) console.log('Run with --dev for watch support');
+}).catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

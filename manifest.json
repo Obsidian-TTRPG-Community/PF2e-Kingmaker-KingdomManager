@@ -1,0 +1,24 @@
+// Build + run smoke test in one go.
+import * as esbuild from 'esbuild';
+import { execSync } from 'node:child_process';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+const tmp = mkdirSync(join(tmpdir(), `km-smoke-${Date.now()}`), { recursive: true });
+const outFile = join(tmp, 'smoke.cjs');
+
+await esbuild.build({
+  entryPoints: ['tests/smoke.ts'],
+  outfile: outFile,
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  target: 'node18',
+  loader: { '.png': 'empty' },
+  external: ['obsidian'],
+  logLevel: 'error',
+});
+
+console.log('Bundled. Running tests...\n');
+execSync(`node ${outFile}`, { stdio: 'inherit' });
